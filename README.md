@@ -1,544 +1,749 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBERPUNK // TACTICAL GRID</title>
-    <style>
-        :root {
-            --neon-blue: #00f3ff;
-            --neon-pink: #ff0055;
-            --neon-yellow: #ffe600;
-            --dark-bg: #0a0a12;
-            --panel-bg: #121324;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080b18">
+<title>Crypto Clash</title>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-            font-family: 'Courier New', Courier, monospace;
-        }
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-        body {
-            background-color: var(--dark-bg);
-            color: #fff;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
+body {
+    background: #080b18;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+}
 
-        #sidebar {
-            width: 320px;
-            background-color: var(--panel-bg);
-            border-right: 2px solid var(--neon-blue);
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            box-shadow: 5px 0 15px rgba(0, 243, 255, 0.2);
-            z-index: 10;
-        }
+.app {
+    max-width: 440px;
+    min-height: 100vh;
+    margin: auto;
+    padding: 20px 16px 100px;
+    background:
+      radial-gradient(ellipse at top, #17244b 0%, #080b18 55%);
+}
 
-        h1 {
-            color: var(--neon-pink);
-            font-size: 24px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 5px;
-            text-shadow: 0 0 8px var(--neon-pink);
-        }
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
 
-        .subtitle {
-            color: var(--neon-blue);
-            font-size: 11px;
-            margin-bottom: 20px;
-            letter-spacing: 1px;
-        }
+.logo {
+    font-size: 23px;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
 
-        .resource-panel {
-            background: rgba(0, 243, 255, 0.05);
-            border: 1px solid var(--neon-blue);
-            padding: 12px;
-            margin-bottom: 20px;
-        }
+.logo span {
+    color: #38f8e2;
+}
 
-        .resource {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
+.badge {
+    padding: 8px 12px;
+    border-radius: 20px;
+    background: #172d39;
+    color: #38f8e2;
+    font-size: 12px;
+}
 
-        .resource:last-child {
-            margin-bottom: 0;
-        }
+.card {
+    background: rgba(19, 27, 54, .88);
+    border: 1px solid #293a66;
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 18px;
+}
 
-        .val {
-            color: var(--neon-yellow);
-            font-weight: bold;
-        }
+.label {
+    font-size: 12px;
+    color: #9caed8;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+}
 
-        .controls-title {
-            color: var(--neon-blue);
-            font-size: 14px;
-            margin-bottom: 10px;
-            border-bottom: 1px solid var(--neon-blue);
-            padding-bottom: 4px;
-        }
+.balance {
+    font-size: 34px;
+    font-weight: 900;
+    margin-top: 8px;
+}
 
-        .btn {
-            background: transparent;
-            border: 1px solid var(--neon-blue);
-            color: var(--neon-blue);
-            padding: 12px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            text-transform: uppercase;
-            transition: all 0.2s;
-            text-align: left;
-        }
+.balance span {
+    color: #38f8e2;
+}
 
-        .btn:hover:not(:disabled) {
-            background: var(--neon-blue);
-            color: var(--dark-bg);
-            box-shadow: 0 0 10px var(--neon-blue);
-        }
+.stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
 
-        .btn:disabled {
-            border-color: #444;
-            color: #666;
-            cursor: not-allowed;
-        }
+.stat {
+    background: #101a34;
+    border: 1px solid #25345b;
+    padding: 14px;
+    border-radius: 14px;
+}
 
-        #end-turn-btn {
-            border-color: var(--neon-pink);
-            color: var(--neon-pink);
-            margin-top: auto;
-            text-align: center;
-        }
+.stat strong {
+    display: block;
+    font-size: 20px;
+    margin-top: 8px;
+}
 
-        #end-turn-btn:hover {
-            background: var(--neon-pink);
-            color: #fff;
-            box-shadow: 0 0 10px var(--neon-pink);
-        }
+.core-area {
+    text-align: center;
+    padding: 12px 0 22px;
+}
 
-        #info-box {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px dashed #444;
-            padding: 10px;
-            font-size: 12px;
-            color: #aaa;
-            min-height: 100px;
-            margin-bottom: 20px;
-        }
+.core {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    border: 3px solid #38f8e2;
+    margin: 24px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 75px;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+    background:
+      radial-gradient(circle, #275b86 0%, #123052 45%, #10142d 72%);
+    box-shadow:
+      0 0 25px rgba(56,248,226,.45),
+      inset 0 0 30px rgba(56,248,226,.25);
+    transition: transform .08s;
+}
 
-        #info-box strong {
-            color: #fff;
-        }
+.core:active {
+    transform: scale(.94);
+}
 
-        #game-container {
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            background: radial-gradient(circle, #1a1c38 0%, #0a0a12 100%);
-        }
+.energy-track {
+    height: 12px;
+    background: #1d2949;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 12px 0 8px;
+}
 
-        canvas {
-            border: 2px solid var(--neon-blue);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
-            background-color: #0d0e1b;
-        }
+.energy-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #38f8e2, #4f83ff);
+    transition: width .2s;
+}
 
-        #turn-indicator {
-            position: absolute;
-            top: 20px;
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--neon-blue);
-            letter-spacing: 2px;
-            background: rgba(10, 10, 18, 0.8);
-            padding: 8px 16px;
-            border: 1px solid var(--neon-blue);
-        }
-    </style>
+button {
+    border: 0;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    border-radius: 12px;
+    padding: 13px;
+    background: linear-gradient(110deg, #2877f5, #7b48ef);
+}
+
+button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.wide {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.section-title {
+    font-size: 18px;
+    margin-bottom: 14px;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 13px 0;
+    border-bottom: 1px solid #283352;
+}
+
+.item:last-child {
+    border-bottom: 0;
+}
+
+.item-info {
+    flex: 1;
+}
+
+.item-info strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.item-info small {
+    color: #9caed8;
+    font-size: 12px;
+}
+
+.item button {
+    min-width: 105px;
+    font-size: 12px;
+}
+
+.nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 440px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    padding: 12px 5px;
+    background: #10172b;
+    border-top: 1px solid #293a66;
+}
+
+.nav button {
+    background: transparent;
+    font-size: 11px;
+    padding: 8px 2px;
+}
+
+.nav button.active {
+    color: #38f8e2;
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+.notice {
+    color: #38f8e2;
+    font-size: 13px;
+    min-height: 18px;
+    margin-top: 12px;
+}
+
+.mission {
+    margin-bottom: 12px;
+}
+
+.progress {
+    color: #38f8e2;
+    font-size: 12px;
+    margin-top: 7px;
+}
+
+.rank {
+    color: #ffc95b;
+    font-weight: bold;
+}
+</style>
 </head>
+
 <body>
+<div class="app">
 
-    <div id="sidebar">
-        <h1>Cyberpunk</h1>
-        <div class="subtitle">TACTICAL GRID v1.0</div>
+    <header class="header">
+        <div class="logo">CRYPTO <span>CLASH</span></div>
+        <div class="badge">⚡ SEASON 1</div>
+    </header>
 
-        <div class="resource-panel">
-            <div class="resource">CREDITS: <span id="res-credits" class="val">100</span></div>
-            <div class="resource">DATA NODES: <span id="res-data" class="val">0</span></div>
-        </div>
+    <main id="gamePage" class="page active">
 
-        <div class="controls-title">RECRUITMENT</div>
-        <button class="btn" id="buy-runner" onclick="recruit('runner')">
-            Hacker Runner (50c)<br>
-            <small style="font-weight:normal; font-size:10px;">Fast / Captures Nodes</small>
-        </button>
-        <button class="btn" id="buy-cyborg" onclick="recruit('cyborg')">
-            Street Cyborg (80c)<br>
-            <small style="font-weight:normal; font-size:10px;">Heavy Combat Unit</small>
-        </button>
+        <section class="card">
+            <div class="label">Your coin balance</div>
+            <div class="balance"><span id="coins">0</span> CC</div>
+            <div style="margin-top:8px;color:#9caed8;font-size:12px">
+                Rank: <span class="rank" id="rank">Rookie</span>
+            </div>
+        </section>
 
-        <div class="controls-title" style="margin-top: 15px;">TARGET INFO</div>
-        <div id="info-box">Select a unit or node to inspect stats.</div>
+        <section class="stats">
+            <div class="stat">
+                <div class="label">Per tap</div>
+                <strong>⚡ <span id="power">1</span></strong>
+            </div>
+            <div class="stat">
+                <div class="label">Passive / sec</div>
+                <strong>🤖 <span id="passive">0</span></strong>
+            </div>
+        </section>
 
-        <button class="btn" id="end-turn-btn" onclick="endTurn()">End Turn</button>
-    </div>
+        <section class="core-area">
+            <div class="label">Tap the energy core</div>
 
-    <div id="game-container">
-        <div id="turn-indicator">PLAYER TURN</div>
-        <canvas id="gridCanvas" width="720" height="720"></canvas>
-    </div>
+            <div class="core" id="core" role="button"
+                 aria-label="Tap energy core">⚛️</div>
 
-    <script>
-        const canvas = document.getElementById('gridCanvas');
-        const ctx = canvas.getContext('2d');
+            <div class="label">
+                Energy: <span id="energyText">1000 / 1000</span>
+            </div>
 
-        const GRID_SIZE = 12;
-        const TILE_SIZE = canvas.width / GRID_SIZE;
+            <div class="energy-track">
+                <div class="energy-fill" id="energyFill"></div>
+            </div>
 
-        // Game State
-        let turn = 'player'; // 'player' or 'ai'
-        let credits = 100;
-        let selectedUnit = null;
+            <div style="color:#9caed8;font-size:12px">
+                Energy regenerates automatically.
+            </div>
 
-        // Map layout (0: Empty, 1: Obstacle/Building, 2: Data Node)
-        const map = [
-            [0,0,0,0,0,1,0,0,0,0,0,0],
-            [0,2,0,0,0,1,0,0,0,2,0,0],
-            [0,0,0,1,0,0,0,1,0,0,0,0],
-            [0,0,1,1,0,0,0,1,1,0,0,0],
-            [0,0,0,0,2,0,0,2,0,0,0,0],
-            [1,1,0,0,0,0,0,0,0,0,1,1],
-            [1,1,0,0,0,0,0,0,0,0,1,1],
-            [0,0,0,0,2,0,0,2,0,0,0,0],
-            [0,0,1,1,0,0,0,1,1,0,0,0],
-            [0,0,0,1,0,0,0,1,0,0,0,0],
-            [0,2,0,0,0,1,0,0,0,2,0,0],
-            [0,0,0,0,0,1,0,0,0,0,0,0]
-        ];
+            <div class="notice" id="notice" aria-live="polite"></div>
+        </section>
 
-        // Owner of nodes: null, 'player', or 'ai'
-        const nodeOwners = {};
+        <section class="card">
+            <h2 class="section-title">🚀 Quick Upgrade</h2>
 
-        // Unit definitions
-        const UNIT_TYPES = {
-            runner: { name: 'Hacker Runner', hp: 30, atk: 12, range: 1, move: 3, cost: 50, color: '#00f3ff' },
-            cyborg: { name: 'Street Cyborg', hp: 60, atk: 25, range: 1, move: 2, cost: 80, color: '#ffe600' }
-        };
+            <div class="item">
+                <div class="item-info">
+                    <strong>Power Gloves</strong>
+                    <small>Increase coins earned per tap.</small>
+                </div>
+                <button id="quickUpgrade">Upgrade</button>
+            </div>
+        </section>
 
-        let units = [
-            { id: 1, type: 'runner', owner: 'player', x: 0, y: 0, hp: 30, maxHp: 30, movesLeft: 3, attacked: false },
-            { id: 2, type: 'cyborg', owner: 'player', x: 1, y: 0, hp: 60, maxHp: 60, movesLeft: 2, attacked: false },
-            { id: 3, type: 'runner', owner: 'ai', x: 11, y: 11, hp: 30, maxHp: 30, movesLeft: 3, attacked: false },
-            { id: 4, type: 'cyborg', owner: 'ai', x: 10, y: 11, hp: 60, maxHp: 60, movesLeft: 2, attacked: false }
-        ];
+    </main>
 
-        let unitIdCounter = 5;
+    <main id="upgradePage" class="page">
+        <section class="card">
+            <h2 class="section-title">🚀 Upgrade Laboratory</h2>
+            <div id="upgradeList"></div>
+        </section>
+    </main>
 
-        // Initialize Node Owners
-        for(let r=0; r<GRID_SIZE; r++){
-            for(let c=0; c<GRID_SIZE; c++){
-                if(map[r][c] === 2) nodeOwners[`${r},${c}`] = null;
-            }
+    <main id="missionPage" class="page">
+        <section class="card">
+            <h2 class="section-title">🎯 Missions</h2>
+            <p style="color:#9caed8;font-size:13px;margin-bottom:16px">
+                Complete missions to earn bonus coins.
+            </p>
+            <div id="missionList"></div>
+        </section>
+
+        <section class="card">
+            <h2 class="section-title">🎁 Daily Reward</h2>
+            <p style="color:#9caed8;font-size:13px">
+                Return every day to claim your reward.
+            </p>
+            <button class="wide" id="dailyButton">Claim Daily Reward</button>
+            <div class="notice" id="dailyNotice"></div>
+        </section>
+    </main>
+
+    <main id="profilePage" class="page">
+        <section class="card">
+            <h2 class="section-title">👤 Player Profile</h2>
+            <div class="item">
+                <span>Rank</span><strong id="profileRank">Rookie</strong>
+            </div>
+            <div class="item">
+                <span>Total taps</span><strong id="totalTaps">0</strong>
+            </div>
+            <div class="item">
+                <span>Coins earned</span><strong id="totalEarned">0</strong>
+            </div>
+            <div class="item">
+                <span>Tap power</span><strong id="profilePower">1</strong>
+            </div>
+            <button class="wide" id="resetButton">Reset Local Game</button>
+            <p style="font-size:11px;color:#9caed8;margin-top:12px">
+                Prototype only. Progress is saved on this device.
+            </p>
+        </section>
+    </main>
+
+</div>
+
+<nav class="nav">
+    <button class="active" data-page="gamePage">⚛️<br>Play</button>
+    <button data-page="upgradePage">🚀<br>Upgrades</button>
+    <button data-page="missionPage">🎯<br>Missions</button>
+    <button data-page="profilePage">👤<br>Profile</button>
+</nav>
+
+<script>
+const SAVE_KEY = "cryptoClashSaveV1";
+
+const initialState = () => ({
+    coins: 0,
+    energy: 1000,
+    maxEnergy: 1000,
+    power: 1,
+    passive: 0,
+    taps: 0,
+    totalEarned: 0,
+    lastEnergyTime: Date.now(),
+    lastDaily: "",
+    upgrades: {
+        gloves: 0,
+        bot: 0,
+        battery: 0
+    },
+    claimedMissions: []
+});
+
+let state = loadState();
+
+function loadState() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
+        if (saved && typeof saved === "object") {
+            const base = initialState();
+            return {
+                ...base,
+                ...saved,
+                upgrades: {...base.upgrades, ...(saved.upgrades || {})},
+                claimedMissions: Array.isArray(saved.claimedMissions)
+                    ? saved.claimedMissions : []
+            };
         }
+    } catch (error) {
+        console.warn("Save could not be loaded.");
+    }
+    return initialState();
+}
 
-        // --- DRAWING FUNCTIONS ---
+function saveState() {
+    try {
+        localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+    } catch (error) {
+        showNotice("Saving is unavailable in this browser.");
+    }
+}
 
-        function drawGrid() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+function number(n) {
+    return Math.floor(n).toLocaleString();
+}
 
-            for (let r = 0; r < GRID_SIZE; r++) {
-                for (let c = 0; c < GRID_SIZE; c++) {
-                    const x = c * TILE_SIZE;
-                    const y = r * TILE_SIZE;
+function showNotice(message) {
+    document.getElementById("notice").textContent = message;
+}
 
-                    // Draw base tile
-                    ctx.strokeStyle = '#1a1c38';
-                    ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+function rankName() {
+    if (state.totalEarned >= 100000) return "Crypto Legend";
+    if (state.totalEarned >= 25000) return "Elite Hacker";
+    if (state.totalEarned >= 5000) return "Cyber Warrior";
+    if (state.totalEarned >= 1000) return "Rising Trader";
+    return "Rookie";
+}
 
-                    // Draw terrain
-                    if (map[r][c] === 1) { // Building
-                        ctx.fillStyle = '#1c1d36';
-                        ctx.fillRect(x + 2, y + 2, TILE_SIZE - 4, TILE_SIZE - 4);
-                        ctx.strokeStyle = '#ff0055';
-                        ctx.strokeRect(x + 4, y + 4, TILE_SIZE - 8, TILE_SIZE - 8);
-                    } else if (map[r][c] === 2) { // Data Node
-                        const owner = nodeOwners[`${r},${c}`];
-                        ctx.fillStyle = owner === 'player' ? 'rgba(0,243,255,0.3)' : owner === 'ai' ? 'rgba(255,0,85,0.3)' : 'rgba(255,230,0,0.2)';
-                        ctx.fillRect(x + 2, y + 2, TILE_SIZE - 4, TILE_SIZE - 4);
-                        
-                        ctx.fillStyle = owner === 'player' ? '#00f3ff' : owner === 'ai' ? '#ff0055' : '#ffe600';
-                        ctx.beginPath();
-                        ctx.arc(x + TILE_SIZE/2, y + TILE_SIZE/2, 8, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                }
-            }
+function addCoins(amount) {
+    if (!Number.isFinite(amount) || amount <= 0) return;
+    state.coins += amount;
+    state.totalEarned += amount;
+}
 
-            // Draw highlight overlay for selected unit movement
-            if (selectedUnit && selectedUnit.owner === 'player' && turn === 'player') {
-                drawMovementRange(selectedUnit);
-            }
+function tapCore() {
+    if (state.energy < 1) {
+        showNotice("⚡ Out of energy! Wait for regeneration.");
+        return;
+    }
 
-            // Draw Units
-            units.forEach(u => {
-                const x = u.x * TILE_SIZE;
-                const y = u.y * TILE_SIZE;
-                const stats = UNIT_TYPES[u.type];
+    state.energy -= 1;
+    state.taps += 1;
+    addCoins(state.power);
 
-                // Base indicator
-                ctx.fillStyle = u.owner === 'player' ? '#00f3ff' : '#ff0055';
-                ctx.beginPath();
-                ctx.arc(x + TILE_SIZE/2, y + TILE_SIZE/2, 16, 0, Math.PI * 2);
-                ctx.fill();
+    showNotice("+" + number(state.power) + " CC earned!");
+    render();
+    saveState();
+}
 
-                // Unit Inner Icon
-                ctx.fillStyle = stats.color;
-                ctx.fillRect(x + TILE_SIZE/2 - 6, y + TILE_SIZE/2 - 6, 12, 12);
+document.getElementById("core").addEventListener("pointerdown", event => {
+    event.preventDefault();
+    tapCore();
+});
 
-                // Selection Ring
-                if (selectedUnit && selectedUnit.id === u.id) {
-                    ctx.strokeStyle = '#fff';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(x + 2, y + 2, TILE_SIZE - 4, TILE_SIZE - 4);
-                    ctx.lineWidth = 1;
-                }
+function upgradeCost(type) {
+    const levels = state.upgrades[type];
 
-                // HP Bar
-                const hpPercent = u.hp / u.maxHp;
-                ctx.fillStyle = '#000';
-                ctx.fillRect(x + 6, y + TILE_SIZE - 10, TILE_SIZE - 12, 5);
-                ctx.fillStyle = hpPercent > 0.5 ? '#00ff66' : '#ff0055';
-                ctx.fillRect(x + 6, y + TILE_SIZE - 10, (TILE_SIZE - 12) * hpPercent, 5);
+    if (type === "gloves") return Math.floor(50 * Math.pow(1.65, levels));
+    if (type === "bot") return Math.floor(150 * Math.pow(1.8, levels));
+    if (type === "battery") return Math.floor(100 * Math.pow(1.7, levels));
+
+    return Infinity;
+}
+
+function buyUpgrade(type) {
+    const cost = upgradeCost(type);
+
+    if (state.coins < cost) {
+        showNotice("Not enough CC. Keep tapping!");
+        return;
+    }
+
+    state.coins -= cost;
+    state.upgrades[type] += 1;
+
+    if (type === "gloves") state.power += 1;
+    if (type === "bot") state.passive += 1;
+
+    if (type === "battery") {
+        state.maxEnergy += 250;
+        state.energy = Math.min(
+            state.maxEnergy,
+            state.energy + 250
+        );
+    }
+
+    showNotice("Upgrade purchased successfully!");
+    render();
+    saveState();
+}
+
+document.getElementById("quickUpgrade").addEventListener("click", () => {
+    buyUpgrade("gloves");
+});
+
+const upgrades = [
+    {
+        type: "gloves",
+        icon: "🥊",
+        name: "Power Gloves",
+        description: "+1 coin per tap."
+    },
+    {
+        type: "bot",
+        icon: "🤖",
+        name: "Auto Miner",
+        description: "+1 coin per second."
+    },
+    {
+        type: "battery",
+        icon: "🔋",
+        name: "Energy Battery",
+        description: "+250 maximum energy."
+    }
+];
+
+function renderUpgrades() {
+    const container = document.getElementById("upgradeList");
+    container.innerHTML = "";
+
+    upgrades.forEach(item => {
+        const cost = upgradeCost(item.type);
+        const row = document.createElement("div");
+        row.className = "item";
+
+        const info = document.createElement("div");
+        info.className = "item-info";
+
+        const title = document.createElement("strong");
+        title.textContent = item.icon + " " + item.name;
+
+        const description = document.createElement("small");
+        description.textContent =
+            item.description + " Level " + state.upgrades[item.type];
+
+        info.append(title, description);
+
+        const button = document.createElement("button");
+        button.textContent = number(cost) + " CC";
+        button.disabled = state.coins < cost;
+        button.addEventListener("click", () => buyUpgrade(item.type));
+
+        row.append(info, button);
+        container.appendChild(row);
+    });
+}
+
+const missions = [
+    {
+        id: "tap100",
+        title: "First 100 Taps",
+        description: "Tap the energy core 100 times.",
+        reward: 250,
+        check: () => state.taps >= 100
+    },
+    {
+        id: "earn1000",
+        title: "Coin Collector",
+        description: "Earn 1,000 coins in total.",
+        reward: 500,
+        check: () => state.totalEarned >= 1000
+    },
+    {
+        id: "upgrade3",
+        title: "Upgrade Addict",
+        description: "Purchase 3 upgrades.",
+        reward: 350,
+        check: () =>
+            Object.values(state.upgrades).reduce((a, b) => a + b, 0) >= 3
+    }
+];
+
+function renderMissions() {
+    const container = document.getElementById("missionList");
+    container.innerHTML = "";
+
+    missions.forEach(mission => {
+        const claimed = state.claimedMissions.includes(mission.id);
+        const completed = mission.check();
+
+        const box = document.createElement("div");
+        box.className = "card mission";
+        box.style.marginBottom = "12px";
+
+        const title = document.createElement("strong");
+        title.textContent = mission.title;
+
+        const description = document.createElement("p");
+        description.textContent = mission.description;
+        description.style.cssText =
+            "color:#9caed8;font-size:12px;margin-top:7px";
+
+        const reward = document.createElement("div");
+        reward.className = "progress";
+        reward.textContent = "Reward: " + mission.reward + " CC";
+
+        const button = document.createElement("button");
+        button.className = "wide";
+
+        if (claimed) {
+            button.textContent = "Reward Claimed";
+            button.disabled = true;
+        } else if (completed) {
+            button.textContent = "Claim Reward";
+            button.addEventListener("click", () => {
+                if (!mission.check() ||
+                    state.claimedMissions.includes(mission.id)) return;
+
+                state.claimedMissions.push(mission.id);
+                addCoins(mission.reward);
+                render();
+                saveState();
             });
+        } else {
+            button.textContent = "In Progress";
+            button.disabled = true;
         }
 
-        function drawMovementRange(unit) {
-            ctx.fillStyle = 'rgba(0, 243, 255, 0.15)';
-            for (let r = 0; r < GRID_SIZE; r++) {
-                for (let c = 0; c < GRID_SIZE; c++) {
-                    const dist = Math.abs(unit.x - c) + Math.abs(unit.y - r);
-                    if (dist <= unit.movesLeft && map[r][c] !== 1 && !getUnitAt(c, r)) {
-                        ctx.fillRect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-                    }
-                }
-            }
-        }
+        box.append(title, description, reward, button);
+        container.appendChild(box);
+    });
+}
 
-        // --- GAME LOGIC ---
+function todayKey() {
+    const date = new Date();
+    return date.getFullYear() + "-" +
+        String(date.getMonth() + 1).padStart(2, "0") + "-" +
+        String(date.getDate()).padStart(2, "0");
+}
 
-        function getUnitAt(x, y) {
-            return units.find(u => u.x === x && u.y === y);
-        }
+document.getElementById("dailyButton").addEventListener("click", () => {
+    const today = todayKey();
 
-        canvas.addEventListener('click', (e) => {
-            if (turn !== 'player') return;
+    if (state.lastDaily === today) {
+        document.getElementById("dailyNotice").textContent =
+            "You have already claimed today's reward.";
+        return;
+    }
 
-            const rect = canvas.getBoundingClientRect();
-            const clickX = Math.floor((e.clientX - rect.left) / TILE_SIZE);
-            const clickY = Math.floor((e.clientY - rect.top) / TILE_SIZE);
+    state.lastDaily = today;
+    addCoins(500);
 
-            const clickedUnit = getUnitAt(clickX, clickY);
+    document.getElementById("dailyNotice").textContent =
+        "🎉 You claimed 500 CC!";
+    render();
+    saveState();
+});
 
-            // Unit Selection
-            if (clickedUnit) {
-                if (clickedUnit.owner === 'player') {
-                    selectedUnit = clickedUnit;
-                    updateInfoBox(selectedUnit);
-                } else if (selectedUnit && selectedUnit.owner === 'player' && !selectedUnit.attacked) {
-                    // Attack AI unit
-                    const dist = Math.abs(selectedUnit.x - clickX) + Math.abs(selectedUnit.y - clickY);
-                    if (dist <= UNIT_TYPES[selectedUnit.type].range) {
-                        attackUnit(selectedUnit, clickedUnit);
-                    }
-                }
-                drawGrid();
-                return;
-            }
+function render() {
+    document.getElementById("coins").textContent = number(state.coins);
+    document.getElementById("power").textContent = number(state.power);
+    document.getElementById("passive").textContent = number(state.passive);
 
-            // Movement / Action
-            if (selectedUnit && selectedUnit.owner === 'player') {
-                const dist = Math.abs(selectedUnit.x - clickX) + Math.abs(selectedUnit.y - clickY);
-                if (dist <= selectedUnit.movesLeft && map[clickY][clickX] !== 1) {
-                    selectedUnit.x = clickX;
-                    selectedUnit.y = clickY;
-                    selectedUnit.movesLeft -= dist;
+    document.getElementById("energyText").textContent =
+        number(state.energy) + " / " + number(state.maxEnergy);
 
-                    // Capture node if on one
-                    if (map[clickY][clickX] === 2) {
-                        nodeOwners[`${clickY},${clickX}`] = 'player';
-                        updateResourcesUI();
-                    }
-                }
-            }
+    document.getElementById("energyFill").style.width =
+        (state.energy / state.maxEnergy * 100) + "%";
 
-            drawGrid();
-        });
+    document.getElementById("rank").textContent = rankName();
+    document.getElementById("profileRank").textContent = rankName();
+    document.getElementById("totalTaps").textContent = number(state.taps);
+    document.getElementById("totalEarned").textContent =
+        number(state.totalEarned);
+    document.getElementById("profilePower").textContent =
+        number(state.power);
 
-        function attackUnit(attacker, defender) {
-            const stats = UNIT_TYPES[attacker.type];
-            defender.hp -= stats.atk;
-            attacker.attacked = true;
-            attacker.movesLeft = 0;
+    document.getElementById("quickUpgrade").textContent =
+        number(upgradeCost("gloves")) + " CC";
 
-            if (defender.hp <= 0) {
-                units = units.filter(u => u.id !== defender.id);
-                if (selectedUnit && selectedUnit.id === defender.id) selectedUnit = null;
-            }
+    document.getElementById("quickUpgrade").disabled =
+        state.coins < upgradeCost("gloves");
 
-            updateInfoBox(attacker);
-            checkWinCondition();
-        }
+    renderUpgrades();
+    renderMissions();
+}
 
-        function recruit(type) {
-            if (turn !== 'player') return;
-            const cost = UNIT_TYPES[type].cost;
-            if (credits < cost) return;
+document.querySelectorAll(".nav button").forEach(button => {
+    button.addEventListener("click", () => {
+        document.querySelectorAll(".nav button").forEach(b =>
+            b.classList.remove("active")
+        );
 
-            // Spawn near top-left area
-            const spawnPoints = [{x:0, y:0}, {x:1, y:0}, {x:0, y:1}, {x:1, y:1}];
-            const freeSpot = spawnPoints.find(p => !getUnitAt(p.x, p.y));
+        button.classList.add("active");
 
-            if (freeSpot) {
-                credits -= cost;
-                units.push({
-                    id: unitIdCounter++,
-                    type: type,
-                    owner: 'player',
-                    x: freeSpot.x,
-                    y: freeSpot.y,
-                    hp: UNIT_TYPES[type].hp,
-                    maxHp: UNIT_TYPES[type].hp,
-                    movesLeft: 0,
-                    attacked: true
-                });
-                updateResourcesUI();
-                drawGrid();
-            } else {
-                alert("Spawn zone occupied!");
-            }
-        }
+        document.querySelectorAll(".page").forEach(page =>
+            page.classList.remove("active")
+        );
 
-        function endTurn() {
-            if (turn === 'player') {
-                turn = 'ai';
-                document.getElementById('turn-indicator').innerText = "AI TURN";
-                document.getElementById('turn-indicator').style.color = "var(--neon-pink)";
-                selectedUnit = null;
-                setTimeout(runAITurn, 800);
-            }
-        }
+        document.getElementById(button.dataset.page)
+            .classList.add("active");
+    });
+});
 
-        function runAITurn() {
-            // Process AI movement & attacks
-            const aiUnits = units.filter(u => u.owner === 'ai');
+document.getElementById("resetButton").addEventListener("click", () => {
+    if (!confirm("Erase all local game progress?")) return;
 
-            aiUnits.forEach(u => {
-                let targets = units.filter(enemy => enemy.owner === 'player');
-                if (targets.length === 0) return;
+    state = initialState();
+    saveState();
+    render();
+    document.getElementById("dailyNotice").textContent = "";
+    showNotice("Your game has been reset.");
+});
 
-                // Find closest player unit
-                let closest = targets[0];
-                let minDist = Math.abs(u.x - closest.x) + Math.abs(u.y - closest.y);
+function gameTick() {
+    const now = Date.now();
+    const elapsed = Math.max(
+        0,
+        Math.min((now - state.lastEnergyTime) / 1000, 3600)
+    );
 
-                targets.forEach(t => {
-                    let d = Math.abs(u.x - t.x) + Math.abs(u.y - t.y);
-                    if (d < minDist) {
-                        minDist = d;
-                        closest = t;
-                    }
-                });
+    // Regenerate one energy per second.
+    state.energy = Math.min(
+        state.maxEnergy,
+        state.energy + elapsed
+    );
 
-                // Attack if in range
-                if (minDist <= UNIT_TYPES[u.type].range) {
-                    attackUnit(u, closest);
-                } else {
-                    // Step towards target
-                    let moveDist = UNIT_TYPES[u.type].move;
-                    let dx = Math.sign(closest.x - u.x);
-                    let dy = Math.sign(closest.y - u.y);
+    // Passive mining income.
+    if (elapsed > 0 && state.passive > 0) {
+        addCoins(state.passive * elapsed);
+    }
 
-                    let newX = u.x + (dx * Math.min(moveDist, Math.abs(closest.x - u.x)));
-                    let newY = u.y + (dy * Math.min(moveDist, Math.abs(closest.y - u.y)));
+    state.lastEnergyTime = now;
+    render();
+    saveState();
+}
 
-                    if (map[newY][newX] !== 1 && !getUnitAt(newX, newY)) {
-                        u.x = newX;
-                        u.y = newY;
-                    }
-
-                    // Check if standing on a Data Node
-                    if (map[u.y][u.x] === 2) {
-                        nodeOwners[`${u.y},${u.x}`] = 'ai';
-                    }
-                }
-            });
-
-            // Turn reset for Player
-            turn = 'player';
-            document.getElementById('turn-indicator').innerText = "PLAYER TURN";
-            document.getElementById('turn-indicator').style.color = "var(--neon-blue)";
-
-            // Income processing
-            let playerNodes = Object.values(nodeOwners).filter(v => v === 'player').length;
-            credits += 40 + (playerNodes * 20);
-
-            // Reset unit movement
-            units.forEach(u => {
-                u.movesLeft = UNIT_TYPES[u.type].move;
-                u.attacked = false;
-            });
-
-            updateResourcesUI();
-            drawGrid();
-            checkWinCondition();
-        }
-
-        function updateResourcesUI() {
-            document.getElementById('res-credits').innerText = credits;
-            let playerNodes = Object.values(nodeOwners).filter(v => v === 'player').length;
-            document.getElementById('res-data').innerText = playerNodes;
-
-            document.getElementById('buy-runner').disabled = credits < UNIT_TYPES.runner.cost;
-            document.getElementById('buy-cyborg').disabled = credits < UNIT_TYPES.cyborg.cost;
-        }
-
-        function updateInfoBox(unit) {
-            const stats = UNIT_TYPES[unit.type];
-            document.getElementById('info-box').innerHTML = `
-                <strong>${stats.name}</strong> (${unit.owner.toUpperCase()})<br>
-                HP: ${unit.hp}/${unit.maxHp}<br>
-                ATK: ${stats.atk}<br>
-                Moves Left: ${unit.movesLeft}<br>
-                Attacked: ${unit.attacked ? 'Yes' : 'No'}
-            `;
-        }
-
-        function checkWinCondition() {
-            const playerUnits = units.filter(u => u.owner === 'player');
-            const aiUnits = units.filter(u => u.owner === 'ai');
-
-            if (aiUnits.length === 0) {
-                alert("SYSTEM OVERRIDE SUCCESSFUL: YOU WIN!");
-                location.reload();
-            } else if (playerUnits.length === 0 && credits < 50) {
-                alert("CRITICAL SYSTEM FAILURE: GAME OVER!");
-                location.reload();
-            }
-        }
-
-        // Initialize Display
-        updateResourcesUI();
-        drawGrid();
-    </script>
+render();
+setInterval(gameTick, 1000);
+</script>
 </body>
 </html>
