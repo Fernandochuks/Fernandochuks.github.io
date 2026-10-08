@@ -1,749 +1,415 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#080b18">
-<title>Crypto Clash</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Telegram Casino Mini App</title>
 
-<style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-body {
-    background: #080b18;
-    color: #ffffff;
-    font-family: Arial, sans-serif;
-    min-height: 100vh;
-}
+  <style>
+    :root {
+      --bg-color: var(--tg-theme-bg-color, #17212b);
+      --text-color: var(--tg-theme-text-color, #ffffff);
+      --hint-color: var(--tg-theme-hint-color, #708499);
+      --button-color: var(--tg-theme-button-color, #5288c1);
+      --button-text-color: var(--tg-theme-button-text-color, #ffffff);
+      --secondary-bg: var(--tg-theme-secondary-bg-color, #232e3c);
+      --accent-color: #f39c12;
+    }
 
-.app {
-    max-width: 440px;
-    min-height: 100vh;
-    margin: auto;
-    padding: 20px 16px 100px;
-    background:
-      radial-gradient(ellipse at top, #17244b 0%, #080b18 55%);
-}
+    * {
+      box-sizing: border-box;
+      user-select: none;
+    }
 
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-}
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
 
-.logo {
-    font-size: 23px;
-    font-weight: 900;
-    letter-spacing: 1px;
-}
+    .header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: var(--secondary-bg);
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
 
-.logo span {
-    color: #38f8e2;
-}
+    .user-info {
+      font-weight: 600;
+      font-size: 14px;
+    }
 
-.badge {
-    padding: 8px 12px;
-    border-radius: 20px;
-    background: #172d39;
-    color: #38f8e2;
-    font-size: 12px;
-}
+    .balance-box {
+      font-weight: 700;
+      color: var(--accent-color);
+      font-size: 16px;
+    }
 
-.card {
-    background: rgba(19, 27, 54, .88);
-    border: 1px solid #293a66;
-    border-radius: 18px;
-    padding: 18px;
-    margin-bottom: 18px;
-}
+    .nav-tabs {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      margin-bottom: 20px;
+    }
 
-.label {
-    font-size: 12px;
-    color: #9caed8;
-    text-transform: uppercase;
-    letter-spacing: 1.4px;
-}
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      background: var(--secondary-bg);
+      color: var(--text-color);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
 
-.balance {
-    font-size: 34px;
-    font-weight: 900;
-    margin-top: 8px;
-}
+    .tab-btn.active {
+      background: var(--button-color);
+      color: var(--button-text-color);
+    }
 
-.balance span {
-    color: #38f8e2;
-}
+    .game-card {
+      display: none;
+      width: 100%;
+      background: var(--secondary-bg);
+      border-radius: 16px;
+      padding: 24px 16px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
 
-.stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
+    .game-card.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
 
-.stat {
-    background: #101a34;
-    border: 1px solid #25345b;
-    padding: 14px;
-    border-radius: 14px;
-}
+    /* Slot Machine Styling */
+    .slots-container {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin: 20px 0;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 16px;
+      border-radius: 12px;
+      width: 100%;
+    }
 
-.stat strong {
-    display: block;
-    font-size: 20px;
-    margin-top: 8px;
-}
+    .reel {
+      width: 70px;
+      height: 70px;
+      background: var(--bg-color);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      border: 2px solid var(--accent-color);
+    }
 
-.core-area {
-    text-align: center;
-    padding: 12px 0 22px;
-}
+    /* Roulette Styling */
+    .roulette-board {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+      width: 100%;
+    }
 
-.core {
-    width: 220px;
-    height: 220px;
-    border-radius: 50%;
-    border: 3px solid #38f8e2;
-    margin: 24px auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 75px;
-    cursor: pointer;
-    user-select: none;
-    touch-action: manipulation;
-    background:
-      radial-gradient(circle, #275b86 0%, #123052 45%, #10142d 72%);
-    box-shadow:
-      0 0 25px rgba(56,248,226,.45),
-      inset 0 0 30px rgba(56,248,226,.25);
-    transition: transform .08s;
-}
+    .bet-opt {
+      flex: 1;
+      padding: 16px 8px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
 
-.core:active {
-    transform: scale(.94);
-}
+    .bet-red { background: #e74c3c; color: #fff; }
+    .bet-black { background: #2c3e50; color: #fff; }
+    .bet-opt.selected { border-color: #fff; transform: scale(1.05); }
 
-.energy-track {
-    height: 12px;
-    background: #1d2949;
-    border-radius: 10px;
-    overflow: hidden;
-    margin: 12px 0 8px;
-}
+    .wheel-result {
+      font-size: 48px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 10px 0;
+    }
 
-.energy-fill {
-    height: 100%;
-    width: 100%;
-    background: linear-gradient(90deg, #38f8e2, #4f83ff);
-    transition: width .2s;
-}
+    /* Shared Controls */
+    .bet-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
 
-button {
-    border: 0;
-    cursor: pointer;
-    color: white;
-    font-weight: bold;
-    border-radius: 12px;
-    padding: 13px;
-    background: linear-gradient(110deg, #2877f5, #7b48ef);
-}
+    .bet-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: var(--button-color);
+      color: var(--button-text-color);
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
-button:disabled {
-    opacity: .45;
-    cursor: not-allowed;
-}
+    .action-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--button-color);
+      color: var(--button-text-color);
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
 
-.wide {
-    width: 100%;
-    margin-top: 10px;
-}
+    .action-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
 
-.section-title {
-    font-size: 18px;
-    margin-bottom: 14px;
-}
-
-.item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 13px 0;
-    border-bottom: 1px solid #283352;
-}
-
-.item:last-child {
-    border-bottom: 0;
-}
-
-.item-info {
-    flex: 1;
-}
-
-.item-info strong {
-    display: block;
-    margin-bottom: 5px;
-}
-
-.item-info small {
-    color: #9caed8;
-    font-size: 12px;
-}
-
-.item button {
-    min-width: 105px;
-    font-size: 12px;
-}
-
-.nav {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 440px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    padding: 12px 5px;
-    background: #10172b;
-    border-top: 1px solid #293a66;
-}
-
-.nav button {
-    background: transparent;
-    font-size: 11px;
-    padding: 8px 2px;
-}
-
-.nav button.active {
-    color: #38f8e2;
-}
-
-.page {
-    display: none;
-}
-
-.page.active {
-    display: block;
-}
-
-.notice {
-    color: #38f8e2;
-    font-size: 13px;
-    min-height: 18px;
-    margin-top: 12px;
-}
-
-.mission {
-    margin-bottom: 12px;
-}
-
-.progress {
-    color: #38f8e2;
-    font-size: 12px;
-    margin-top: 7px;
-}
-
-.rank {
-    color: #ffc95b;
-    font-weight: bold;
-}
-</style>
+    .status-msg {
+      margin-top: 12px;
+      min-height: 20px;
+      font-size: 14px;
+      color: var(--hint-color);
+    }
+  </style>
 </head>
-
 <body>
-<div class="app">
 
-    <header class="header">
-        <div class="logo">CRYPTO <span>CLASH</span></div>
-        <div class="badge">⚡ SEASON 1</div>
-    </header>
+  <!-- Header -->
+  <div class="header">
+    <div class="user-info" id="username">Player</div>
+    <div class="balance-box">💰 <span id="balance">1000</span></div>
+  </div>
 
-    <main id="gamePage" class="page active">
+  <!-- Game Selector -->
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('slots')">🎰 Slots</button>
+    <button class="tab-btn" onclick="switchTab('roulette')">🎯 Roulette</button>
+  </div>
 
-        <section class="card">
-            <div class="label">Your coin balance</div>
-            <div class="balance"><span id="coins">0</span> CC</div>
-            <div style="margin-top:8px;color:#9caed8;font-size:12px">
-                Rank: <span class="rank" id="rank">Rookie</span>
-            </div>
-        </section>
+  <!-- Slot Machine Game -->
+  <div id="slots-game" class="game-card active">
+    <h2>Lucky Slots</h2>
+    <div class="slots-container">
+      <div class="reel" id="reel1">🎰</div>
+      <div class="reel" id="reel2">🎰</div>
+      <div class="reel" id="reel3">🎰</div>
+    </div>
+    
+    <div class="bet-controls">
+      <button class="bet-btn" onclick="adjustBet(-50)">-</button>
+      <span>Bet: 💰 <strong id="slot-bet">50</strong></span>
+      <button class="bet-btn" onclick="adjustBet(50)">+</button>
+    </div>
 
-        <section class="stats">
-            <div class="stat">
-                <div class="label">Per tap</div>
-                <strong>⚡ <span id="power">1</span></strong>
-            </div>
-            <div class="stat">
-                <div class="label">Passive / sec</div>
-                <strong>🤖 <span id="passive">0</span></strong>
-            </div>
-        </section>
+    <button class="action-btn" id="spin-btn" onclick="spinSlots()">SPIN</button>
+    <div class="status-msg" id="slot-status">Match 3 to win 10x! Match 2 to win 2x.</div>
+  </div>
 
-        <section class="core-area">
-            <div class="label">Tap the energy core</div>
+  <!-- Roulette Game -->
+  <div id="roulette-game" class="game-card">
+    <h2>Red or Black</h2>
+    <div class="wheel-result" id="roulette-result">❓</div>
 
-            <div class="core" id="core" role="button"
-                 aria-label="Tap energy core">⚛️</div>
+    <div class="roulette-board">
+      <div class="bet-opt bet-red" id="opt-red" onclick="selectRouletteColor('RED')">RED (2x)</div>
+      <div class="bet-opt bet-black" id="opt-black" onclick="selectRouletteColor('BLACK')">BLACK (2x)</div>
+    </div>
 
-            <div class="label">
-                Energy: <span id="energyText">1000 / 1000</span>
-            </div>
+    <div class="bet-controls">
+      <button class="bet-btn" onclick="adjustBet(-50)">-</button>
+      <span>Bet: 💰 <strong id="roulette-bet">50</strong></span>
+      <button class="bet-btn" onclick="adjustBet(50)">+</button>
+    </div>
 
-            <div class="energy-track">
-                <div class="energy-fill" id="energyFill"></div>
-            </div>
+    <button class="action-btn" id="roulette-btn" onclick="playRoulette()">PLAY ROULETTE</button>
+    <div class="status-msg" id="roulette-status">Pick a color to start.</div>
+  </div>
 
-            <div style="color:#9caed8;font-size:12px">
-                Energy regenerates automatically.
-            </div>
+  <script>
+    // Initialize Telegram WebApp SDK
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand(); // Expand Mini App to full height
 
-            <div class="notice" id="notice" aria-live="polite"></div>
-        </section>
+    // State Variables
+    let balance = 1000;
+    let currentBet = 50;
+    let selectedColor = null;
+    const slotSymbols = ['🍒', '🍋', '🍇', '🔔', '💎', '7️⃣'];
 
-        <section class="card">
-            <h2 class="section-title">🚀 Quick Upgrade</h2>
+    // Load User Data from Telegram
+    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+      const user = tg.initDataUnsafe.user;
+      document.getElementById('username').innerText = user.first_name || user.username || 'Player';
+    }
 
-            <div class="item">
-                <div class="item-info">
-                    <strong>Power Gloves</strong>
-                    <small>Increase coins earned per tap.</small>
-                </div>
-                <button id="quickUpgrade">Upgrade</button>
-            </div>
-        </section>
+    function updateUI() {
+      document.getElementById('balance').innerText = balance;
+      document.getElementById('slot-bet').innerText = currentBet;
+      document.getElementById('roulette-bet').innerText = currentBet;
+    }
 
-    </main>
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.game-card').forEach(card => card.classList.remove('active'));
 
-    <main id="upgradePage" class="page">
-        <section class="card">
-            <h2 class="section-title">🚀 Upgrade Laboratory</h2>
-            <div id="upgradeList"></div>
-        </section>
-    </main>
+      if (tab === 'slots') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('slots-game').classList.add('active');
+      } else {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('roulette-game').classList.add('active');
+      }
+    }
 
-    <main id="missionPage" class="page">
-        <section class="card">
-            <h2 class="section-title">🎯 Missions</h2>
-            <p style="color:#9caed8;font-size:13px;margin-bottom:16px">
-                Complete missions to earn bonus coins.
-            </p>
-            <div id="missionList"></div>
-        </section>
+    function adjustBet(amount) {
+      if (currentBet + amount >= 10 && currentBet + amount <= balance) {
+        currentBet += amount;
+        updateUI();
+        if (tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+      }
+    }
 
-        <section class="card">
-            <h2 class="section-title">🎁 Daily Reward</h2>
-            <p style="color:#9caed8;font-size:13px">
-                Return every day to claim your reward.
-            </p>
-            <button class="wide" id="dailyButton">Claim Daily Reward</button>
-            <div class="notice" id="dailyNotice"></div>
-        </section>
-    </main>
+    // --- SLOT MACHINE LOGIC ---
+    function spinSlots() {
+      if (balance < currentBet) {
+        tg.showAlert("Insufficient balance!");
+        return;
+      }
 
-    <main id="profilePage" class="page">
-        <section class="card">
-            <h2 class="section-title">👤 Player Profile</h2>
-            <div class="item">
-                <span>Rank</span><strong id="profileRank">Rookie</strong>
-            </div>
-            <div class="item">
-                <span>Total taps</span><strong id="totalTaps">0</strong>
-            </div>
-            <div class="item">
-                <span>Coins earned</span><strong id="totalEarned">0</strong>
-            </div>
-            <div class="item">
-                <span>Tap power</span><strong id="profilePower">1</strong>
-            </div>
-            <button class="wide" id="resetButton">Reset Local Game</button>
-            <p style="font-size:11px;color:#9caed8;margin-top:12px">
-                Prototype only. Progress is saved on this device.
-            </p>
-        </section>
-    </main>
+      balance -= currentBet;
+      updateUI();
 
-</div>
+      const spinBtn = document.getElementById('spin-btn');
+      spinBtn.disabled = true;
+      document.getElementById('slot-status').innerText = "Spinning...";
 
-<nav class="nav">
-    <button class="active" data-page="gamePage">⚛️<br>Play</button>
-    <button data-page="upgradePage">🚀<br>Upgrades</button>
-    <button data-page="missionPage">🎯<br>Missions</button>
-    <button data-page="profilePage">👤<br>Profile</button>
-</nav>
+      if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
 
-<script>
-const SAVE_KEY = "cryptoClashSaveV1";
+      let spins = 0;
+      const interval = setInterval(() => {
+        document.getElementById('reel1').innerText = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
+        document.getElementById('reel2').innerText = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
+        document.getElementById('reel3').innerText = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
+        spins++;
 
-const initialState = () => ({
-    coins: 0,
-    energy: 1000,
-    maxEnergy: 1000,
-    power: 1,
-    passive: 0,
-    taps: 0,
-    totalEarned: 0,
-    lastEnergyTime: Date.now(),
-    lastDaily: "",
-    upgrades: {
-        gloves: 0,
-        bot: 0,
-        battery: 0
-    },
-    claimedMissions: []
-});
-
-let state = loadState();
-
-function loadState() {
-    try {
-        const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
-        if (saved && typeof saved === "object") {
-            const base = initialState();
-            return {
-                ...base,
-                ...saved,
-                upgrades: {...base.upgrades, ...(saved.upgrades || {})},
-                claimedMissions: Array.isArray(saved.claimedMissions)
-                    ? saved.claimedMissions : []
-            };
+        if (spins > 15) {
+          clearInterval(interval);
+          finalizeSlotSpin();
         }
-    } catch (error) {
-        console.warn("Save could not be loaded.");
+      }, 80);
     }
-    return initialState();
-}
 
-function saveState() {
-    try {
-        localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-    } catch (error) {
-        showNotice("Saving is unavailable in this browser.");
+    function finalizeSlotSpin() {
+      const r1 = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
+      const r2 = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
+      const r3 = slotSymbols[Math.floor(Math.random() * slotSymbols.length)];
+
+      document.getElementById('reel1').innerText = r1;
+      document.getElementById('reel2').innerText = r2;
+      document.getElementById('reel3').innerText = r3;
+
+      let winAmount = 0;
+      if (r1 === r2 && r2 === r3) {
+        winAmount = currentBet * 10;
+        document.getElementById('slot-status').innerText = `🎉 JACKPOT! You won ${winAmount}!`;
+        if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+      } else if (r1 === r2 || r2 === r3 || r1 === r3) {
+        winAmount = currentBet * 2;
+        document.getElementById('slot-status').innerText = `😃 2-of-a-kind! You won ${winAmount}!`;
+        if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+      } else {
+        document.getElementById('slot-status').innerText = "❌ No luck this time. Try again!";
+        if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+      }
+
+      balance += winAmount;
+      updateUI();
+      document.getElementById('spin-btn').disabled = false;
     }
-}
 
-function number(n) {
-    return Math.floor(n).toLocaleString();
-}
+    // --- ROULETTE LOGIC ---
+    function selectRouletteColor(color) {
+      selectedColor = color;
+      document.getElementById('opt-red').classList.toggle('selected', color === 'RED');
+      document.getElementById('opt-black').classList.toggle('selected', color === 'BLACK');
+      if (tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+    }
 
-function showNotice(message) {
-    document.getElementById("notice").textContent = message;
-}
-
-function rankName() {
-    if (state.totalEarned >= 100000) return "Crypto Legend";
-    if (state.totalEarned >= 25000) return "Elite Hacker";
-    if (state.totalEarned >= 5000) return "Cyber Warrior";
-    if (state.totalEarned >= 1000) return "Rising Trader";
-    return "Rookie";
-}
-
-function addCoins(amount) {
-    if (!Number.isFinite(amount) || amount <= 0) return;
-    state.coins += amount;
-    state.totalEarned += amount;
-}
-
-function tapCore() {
-    if (state.energy < 1) {
-        showNotice("⚡ Out of energy! Wait for regeneration.");
+    function playRoulette() {
+      if (!selectedColor) {
+        tg.showAlert("Please select Red or Black first!");
         return;
-    }
-
-    state.energy -= 1;
-    state.taps += 1;
-    addCoins(state.power);
-
-    showNotice("+" + number(state.power) + " CC earned!");
-    render();
-    saveState();
-}
-
-document.getElementById("core").addEventListener("pointerdown", event => {
-    event.preventDefault();
-    tapCore();
-});
-
-function upgradeCost(type) {
-    const levels = state.upgrades[type];
-
-    if (type === "gloves") return Math.floor(50 * Math.pow(1.65, levels));
-    if (type === "bot") return Math.floor(150 * Math.pow(1.8, levels));
-    if (type === "battery") return Math.floor(100 * Math.pow(1.7, levels));
-
-    return Infinity;
-}
-
-function buyUpgrade(type) {
-    const cost = upgradeCost(type);
-
-    if (state.coins < cost) {
-        showNotice("Not enough CC. Keep tapping!");
+      }
+      if (balance < currentBet) {
+        tg.showAlert("Insufficient balance!");
         return;
-    }
+      }
 
-    state.coins -= cost;
-    state.upgrades[type] += 1;
+      balance -= currentBet;
+      updateUI();
 
-    if (type === "gloves") state.power += 1;
-    if (type === "bot") state.passive += 1;
+      const rouletteBtn = document.getElementById('roulette-btn');
+      rouletteBtn.disabled = true;
+      document.getElementById('roulette-status').innerText = "Spinning wheel...";
 
-    if (type === "battery") {
-        state.maxEnergy += 250;
-        state.energy = Math.min(
-            state.maxEnergy,
-            state.energy + 250
-        );
-    }
+      let turns = 0;
+      const interval = setInterval(() => {
+        const tempColor = Math.random() > 0.5 ? '🟥' : '⬛';
+        document.getElementById('roulette-result').innerText = tempColor;
+        turns++;
 
-    showNotice("Upgrade purchased successfully!");
-    render();
-    saveState();
-}
-
-document.getElementById("quickUpgrade").addEventListener("click", () => {
-    buyUpgrade("gloves");
-});
-
-const upgrades = [
-    {
-        type: "gloves",
-        icon: "🥊",
-        name: "Power Gloves",
-        description: "+1 coin per tap."
-    },
-    {
-        type: "bot",
-        icon: "🤖",
-        name: "Auto Miner",
-        description: "+1 coin per second."
-    },
-    {
-        type: "battery",
-        icon: "🔋",
-        name: "Energy Battery",
-        description: "+250 maximum energy."
-    }
-];
-
-function renderUpgrades() {
-    const container = document.getElementById("upgradeList");
-    container.innerHTML = "";
-
-    upgrades.forEach(item => {
-        const cost = upgradeCost(item.type);
-        const row = document.createElement("div");
-        row.className = "item";
-
-        const info = document.createElement("div");
-        info.className = "item-info";
-
-        const title = document.createElement("strong");
-        title.textContent = item.icon + " " + item.name;
-
-        const description = document.createElement("small");
-        description.textContent =
-            item.description + " Level " + state.upgrades[item.type];
-
-        info.append(title, description);
-
-        const button = document.createElement("button");
-        button.textContent = number(cost) + " CC";
-        button.disabled = state.coins < cost;
-        button.addEventListener("click", () => buyUpgrade(item.type));
-
-        row.append(info, button);
-        container.appendChild(row);
-    });
-}
-
-const missions = [
-    {
-        id: "tap100",
-        title: "First 100 Taps",
-        description: "Tap the energy core 100 times.",
-        reward: 250,
-        check: () => state.taps >= 100
-    },
-    {
-        id: "earn1000",
-        title: "Coin Collector",
-        description: "Earn 1,000 coins in total.",
-        reward: 500,
-        check: () => state.totalEarned >= 1000
-    },
-    {
-        id: "upgrade3",
-        title: "Upgrade Addict",
-        description: "Purchase 3 upgrades.",
-        reward: 350,
-        check: () =>
-            Object.values(state.upgrades).reduce((a, b) => a + b, 0) >= 3
-    }
-];
-
-function renderMissions() {
-    const container = document.getElementById("missionList");
-    container.innerHTML = "";
-
-    missions.forEach(mission => {
-        const claimed = state.claimedMissions.includes(mission.id);
-        const completed = mission.check();
-
-        const box = document.createElement("div");
-        box.className = "card mission";
-        box.style.marginBottom = "12px";
-
-        const title = document.createElement("strong");
-        title.textContent = mission.title;
-
-        const description = document.createElement("p");
-        description.textContent = mission.description;
-        description.style.cssText =
-            "color:#9caed8;font-size:12px;margin-top:7px";
-
-        const reward = document.createElement("div");
-        reward.className = "progress";
-        reward.textContent = "Reward: " + mission.reward + " CC";
-
-        const button = document.createElement("button");
-        button.className = "wide";
-
-        if (claimed) {
-            button.textContent = "Reward Claimed";
-            button.disabled = true;
-        } else if (completed) {
-            button.textContent = "Claim Reward";
-            button.addEventListener("click", () => {
-                if (!mission.check() ||
-                    state.claimedMissions.includes(mission.id)) return;
-
-                state.claimedMissions.push(mission.id);
-                addCoins(mission.reward);
-                render();
-                saveState();
-            });
-        } else {
-            button.textContent = "In Progress";
-            button.disabled = true;
+        if (turns > 12) {
+          clearInterval(interval);
+          finalizeRoulette();
         }
-
-        box.append(title, description, reward, button);
-        container.appendChild(box);
-    });
-}
-
-function todayKey() {
-    const date = new Date();
-    return date.getFullYear() + "-" +
-        String(date.getMonth() + 1).padStart(2, "0") + "-" +
-        String(date.getDate()).padStart(2, "0");
-}
-
-document.getElementById("dailyButton").addEventListener("click", () => {
-    const today = todayKey();
-
-    if (state.lastDaily === today) {
-        document.getElementById("dailyNotice").textContent =
-            "You have already claimed today's reward.";
-        return;
+      }, 100);
     }
 
-    state.lastDaily = today;
-    addCoins(500);
+    function finalizeRoulette() {
+      const isRed = Math.random() > 0.5;
+      const outcome = isRed ? 'RED' : 'BLACK';
+      document.getElementById('roulette-result').innerText = isRed ? '🟥' : '⬛';
 
-    document.getElementById("dailyNotice").textContent =
-        "🎉 You claimed 500 CC!";
-    render();
-    saveState();
-});
+      if (selectedColor === outcome) {
+        const winAmount = currentBet * 2;
+        balance += winAmount;
+        document.getElementById('roulette-status').innerText = `🎉 Correct! Landed on ${outcome}. You won ${winAmount}!`;
+        if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+      } else {
+        document.getElementById('roulette-status').innerText = `❌ Landed on ${outcome}. Better luck next time!`;
+        if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+      }
 
-function render() {
-    document.getElementById("coins").textContent = number(state.coins);
-    document.getElementById("power").textContent = number(state.power);
-    document.getElementById("passive").textContent = number(state.passive);
-
-    document.getElementById("energyText").textContent =
-        number(state.energy) + " / " + number(state.maxEnergy);
-
-    document.getElementById("energyFill").style.width =
-        (state.energy / state.maxEnergy * 100) + "%";
-
-    document.getElementById("rank").textContent = rankName();
-    document.getElementById("profileRank").textContent = rankName();
-    document.getElementById("totalTaps").textContent = number(state.taps);
-    document.getElementById("totalEarned").textContent =
-        number(state.totalEarned);
-    document.getElementById("profilePower").textContent =
-        number(state.power);
-
-    document.getElementById("quickUpgrade").textContent =
-        number(upgradeCost("gloves")) + " CC";
-
-    document.getElementById("quickUpgrade").disabled =
-        state.coins < upgradeCost("gloves");
-
-    renderUpgrades();
-    renderMissions();
-}
-
-document.querySelectorAll(".nav button").forEach(button => {
-    button.addEventListener("click", () => {
-        document.querySelectorAll(".nav button").forEach(b =>
-            b.classList.remove("active")
-        );
-
-        button.classList.add("active");
-
-        document.querySelectorAll(".page").forEach(page =>
-            page.classList.remove("active")
-        );
-
-        document.getElementById(button.dataset.page)
-            .classList.add("active");
-    });
-});
-
-document.getElementById("resetButton").addEventListener("click", () => {
-    if (!confirm("Erase all local game progress?")) return;
-
-    state = initialState();
-    saveState();
-    render();
-    document.getElementById("dailyNotice").textContent = "";
-    showNotice("Your game has been reset.");
-});
-
-function gameTick() {
-    const now = Date.now();
-    const elapsed = Math.max(
-        0,
-        Math.min((now - state.lastEnergyTime) / 1000, 3600)
-    );
-
-    // Regenerate one energy per second.
-    state.energy = Math.min(
-        state.maxEnergy,
-        state.energy + elapsed
-    );
-
-    // Passive mining income.
-    if (elapsed > 0 && state.passive > 0) {
-        addCoins(state.passive * elapsed);
+      updateUI();
+      document.getElementById('roulette-btn').disabled = false;
     }
 
-    state.lastEnergyTime = now;
-    render();
-    saveState();
-}
-
-render();
-setInterval(gameTick, 1000);
-</script>
+    updateUI();
+  </script>
 </body>
 </html>
