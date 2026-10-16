@@ -1,0 +1,133 @@
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import { WebSocketServer } from 'ws';
+import { config } from './config.js';
+import { verifyTelegramInitData } from './telegram.js';
+import { broadcastToClients, buildWorldSyncPayload, createSessionForPlayer, handleOrderSubmission, verifySession } from './game/engine.js';
+import { getWorldState, resolveOrder } from './game/engine.js';
+
+const app = express();
+const port = config.port;
+
+app.use(cors());
+app.use(helmet());
+app.use(express.json());
+
+const demoUser = {
+  id: 9001,
+  username: 'DemoCommander',
+  first_name: 'Demo',
+  last_name: 'Commander',
+};
+
+app.get('/health', (_req, res) => {
+  res.json({ ok: true, service: 'neon-empire-server', time: new Date().toISOString() });
+});
+
+app.get('/api/state', (_req, res) => {
+  res.json(getWorldState());
+});
+
+app.post('/api/session', (req, res) => {
+  const { initData, demoName } = req.body ?? {};
+
+  if (config.allowDemoAuth && (!initData || initData === 'demo')) {
+    const username = demoName ?? demoUser.username ?? 'DemoCommander';
+    const session = createSessionForPlayer('player-1', username);
+    return res.json({ ok: true, session, user: { id: demoUser.id, username } });
+  }
+
+  if (!initData) {
+    return res.status(401).json({ ok: false, message: 'Telegram initData is required.' });
+  }
+
+  const user = verifyTelegramInitData(initData, config.telegramBotToken);
+  if (!user) {
+    return res.status(401).json({ ok: false, message: 'Invalid Telegram signature.' });
+  }
+
+  const session = createSessionForPlayer(`player-${user.id ?? 1}`, user.username ?? user.first_name ?? 'Commander');
+  return res.json({ ok: true, session, user });
+});
+
+app.post('/api/order', (req, res) => {
+  const { token, order } = req.body ?? {};
+  const session = verifySession(token);
+
+  if (!session) {
+    return res.status(401).json({ ok: false, message: 'Unauthorized order request.' });
+  }
+
+  const nextOrder = {
+    id: `order-${Date.now()}`,
+    playerId: session.playerId,
+    ...order,
+  };
+
+  const result = resolveOrder(nextOrder);
+  return res.json({ ok: true, result, state: getWorldState() });
+});
+
+app.post('/api/purchase', (req, res) => {
+  const { token, amountTon, packageName } = req.body ?? {};
+  const session = verifySession(token);
+
+  if (!session) {
+    return res.status(401).json({ ok: false, message: 'Unauthorized purchase request.' });
+  }
+
+  const amount = Number(amountTon ?? 0);
+  if (Number.isNaN(amount) || amount < 5) {
+    return res.status(400).json({ ok: false, message: 'Minimum TON purchase is 5.' });
+  }
+
+  const tokenBundle = Math.floor(amount * 100);
+  res.json({
+    ok: true,
+    purchase: {
+      packageName: packageName ?? 'War Chest',
+      amountTon: amount,
+      tokensAwarded: tokenBundle,
+      message: `Purchase accepted. ${tokenBundle} tokens credited in demo mode.`,
+    },
+  });
+});
+
+const server = app.listen(port, () => {
+  console.log(`Neon Empire server listening on http://localhost:${port}`);
+});
+
+const wsServer = new WebSocketServer({ server, path: '/ws' });
+
+wsServer.on('connection', (socket, request) => {
+  const token = new URL(request.url ?? '', 'http://localhost').searchParams.get('token');
+  const session = verifySession(token ?? undefined);
+
+  if (!session) {
+    socket.close(1008, 'Unauthorized');
+    return;
+  }
+
+  socket.send(JSON.stringify(buildWorldSyncPayload()));
+
+  socket.on('message', (raw) => {
+    try {
+      const message = JSON.parse(raw.toString());
+      if (message.type === 'ORDER_PLACED') {
+        const result = handleOrderSubmission({
+          id: `order-${Date.now()}`,
+          playerId: session.playerId,
+          ...message.order,
+        });
+
+        socket.send(JSON.stringify(result));
+        broadcastToClients(wsServer, result);
+      }
+    } catch (error) {
+      socket.send(JSON.stringify({ type: 'ERROR', message: 'Invalid payload.' }));
+    }
+  });
+});
+
+export default app;

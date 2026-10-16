@@ -1,0 +1,226 @@
+import { useEffect, useMemo, useState } from 'react';
+
+type Territory = {
+  id: string;
+  name: string;
+  slug: string;
+  ownerId: string | null;
+  defense: number;
+  terrain: string;
+  x: number;
+  y: number;
+};
+
+type Player = {
+  id: string;
+  username: string;
+  prestige: number;
+  credits: number;
+  supplies: number;
+  fuel: number;
+  metal: number;
+};
+
+const API_BASE = 'http://localhost:4000';
+
+export default function App() {
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
+  const [player, setPlayer] = useState<Player | null>(null);
+  const [territories, setTerritories] = useState<Territory[]>([]);
+  const [status, setStatus] = useState<string>('Connecting to the command network...');
+  const [wsOpen, setWsOpen] = useState(false);
+
+  useEffect(() => {
+    async function bootstrap() {
+      try {
+        const response = await fetch(`${API_BASE}/api/session`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ initData: 'demo', demoName: 'Commander Nova' }),
+        });
+
+        const data = await response.json();
+        if (!data.ok) throw new Error(data.message ?? 'Authentication failed');
+
+        setSessionToken(data.session.token);
+        setPlayer({
+          id: data.session.playerId,
+          username: data.user.username ?? data.user.first_name ?? 'Commander',
+          prestige: 52,
+          credits: 5500,
+          supplies: 4600,
+          fuel: 3300,
+          metal: 3100,
+        });
+        setStatus('Authenticated to the command relay.');
+      } catch (error) {
+        setStatus(error instanceof Error ? error.message : 'Authentication failed');
+      }
+    }
+
+    void bootstrap();
+  }, []);
+
+  useEffect(() => {
+    if (!sessionToken) return;
+
+    const socket = new WebSocket(`ws://localhost:4000/ws?token=${sessionToken}`);
+    socket.onopen = () => setWsOpen(true);
+    socket.onclose = () => setWsOpen(false);
+    socket.onmessage = (event) => {
+      const message = JSON.parse(event.data) as any;
+      if (message.type === 'SYNC') {
+        setTerritories(message.state.territories);
+      }
+      if (message.type === 'ORDER_RESOLVED') {
+        setStatus(message.payload.message ?? 'Order resolved.');
+        if (message.payload.player) setPlayer(message.payload.player);
+      }
+    };
+
+    return () => socket.close();
+  }, [sessionToken]);
+
+  useEffect(() => {
+    async function syncState() {
+      if (!sessionToken) return;
+      const response = await fetch(`${API_BASE}/api/state`);
+      const state = await response.json();
+      setTerritories(state.territories ?? []);
+    }
+
+    void syncState();
+  }, [sessionToken]);
+
+  const controlledTerritories = useMemo(
+    () => territories.filter((territory) => territory.ownerId === player?.id).length,
+    [territories, player],
+  );
+
+  async function launchStrike(territoryId: string) {
+    if (!sessionToken) return;
+    setStatus('Sending strike order to the war room...');
+
+    const response = await fetch(`${API_BASE}/api/order`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token: sessionToken,
+        order: {
+          type: 'attack',
+          territoryId,
+          unit: 'infantry',
+        },
+      }),
+    });
+
+    const data = await response.json();
+    setStatus(data.result?.message ?? 'Order result received.');
+    if (data.state) setTerritories(data.state.territories ?? []);
+    if (data.result?.player) setPlayer(data.result.player);
+  }
+
+  async function recruitUnit(unit: string) {
+    if (!sessionToken) return;
+    setStatus(`Recruiting ${unit}...`);
+
+    const response = await fetch(`${API_BASE}/api/order`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token: sessionToken,
+        order: {
+          type: 'recruit',
+          territoryId: territories[0]?.id ?? 'territory-nova-prime',
+          unit,
+          amount: 1,
+        },
+      }),
+    });
+
+    const data = await response.json();
+    setStatus(data.result?.message ?? 'Recruitment complete.');
+    if (data.result?.player) setPlayer(data.result.player);
+  }
+
+  return (
+    <div className="app-shell">
+      <header className="topbar">
+        <div>
+          <p className="eyebrow">NEON EMPIRE</p>
+          <h1>WORLD WAR</h1>
+        </div>
+        <div className="status-pill">{wsOpen ? 'LIVE' : 'OFFLINE'}</div>
+      </header>
+
+      <section className="resource-grid">
+        <div className="resource-card">
+          <label>Commander</label>
+          <strong>{player?.username ?? 'Unknown'}</strong>
+        </div>
+        <div className="resource-card">
+          <label>Credits</label>
+          <strong>{player?.credits ?? 0} ◈</strong>
+        </div>
+        <div className="resource-card">
+          <label>Supplies</label>
+          <strong>{player?.supplies ?? 0} ▧</strong>
+        </div>
+        <div className="resource-card">
+          <label>Fuel</label>
+          <strong>{player?.fuel ?? 0} ϟ</strong>
+        </div>
+        <div className="resource-card">
+          <label>Metal</label>
+          <strong>{player?.metal ?? 0} ⬡</strong>
+        </div>
+        <div className="resource-card">
+          <label>Prestige</label>
+          <strong>{player?.prestige ?? 0}</strong>
+        </div>
+      </section>
+
+      <section className="hud-grid">
+        <div className="panel map-panel">
+          <h2>Tactical Map</h2>
+          <div className="map-grid">
+            {territories.map((territory) => (
+              <button
+                key={territory.id}
+                className="territory"
+                onClick={() => launchStrike(territory.id)}
+                style={{
+                  gridColumn: territory.x,
+                  gridRow: territory.y,
+                  borderColor: territory.ownerId === player?.id ? '#69f0ae' : '#ff9d00',
+                }}
+              >
+                <span>{territory.name}</span>
+                <small>{territory.defense} DEF</small>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <aside className="panel side-panel">
+          <h2>Empire Status</h2>
+          <ul className="stats-list">
+            <li>Controlled Territories: {controlledTerritories}</li>
+            <li>Enemy Fronts: {Math.max(0, territories.length - controlledTerritories)}</li>
+            <li>Net Defense: {territories.reduce((sum, item) => sum + item.defense, 0)}</li>
+          </ul>
+
+          <h3>Recruitment</h3>
+          <div className="button-stack">
+            <button onClick={() => recruitUnit('infantry')}>Recruit Infantry</button>
+            <button onClick={() => recruitUnit('armor')}>Recruit Armor</button>
+            <button onClick={() => recruitUnit('fighter')}>Recruit Fighter</button>
+          </div>
+
+          <h3>War Room</h3>
+          <p className="status-box">{status}</p>
+        </aside>
+      </section>
+    </div>
+  );
+}
